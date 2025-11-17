@@ -1,9 +1,9 @@
-import { ThemeToggle } from "@/components/theme-toggle";
+import HeroSection from "@/components/hero-section";
 
 export default function Home() {
   return (
     <div>
-      <ThemeToggle />
+      <HeroSection />
     </div>
   );
 }
