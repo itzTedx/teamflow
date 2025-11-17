@@ -3,6 +3,8 @@ import React from "react";
 
 import Link from "next/link";
 
+import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
+import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { Menu, X } from "lucide-react";
 
 import { Logo } from "@/components/logo";
@@ -20,6 +22,9 @@ const menuItems = [
 export const HeroHeader = () => {
   const [menuState, setMenuState] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
+  const { getUser, isLoading } = useKindeBrowserClient();
+
+  const user = getUser();
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -83,23 +88,30 @@ export const HeroHeader = () => {
                   ))}
                 </ul>
               </div>
-              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                <Button asChild className={cn(isScrolled && "lg:hidden")} size="sm" variant="outline">
-                  <Link href="#">
-                    <span>Login</span>
-                  </Link>
-                </Button>
-                <Button asChild className={cn(isScrolled && "lg:hidden")} size="sm">
-                  <Link href="#">
-                    <span>Sign Up</span>
-                  </Link>
-                </Button>
-                <Button asChild className={cn(isScrolled ? "lg:inline-flex" : "hidden")} size="sm">
-                  <Link href="#">
-                    <span>Get Started</span>
-                  </Link>
-                </Button>
-              </div>
+              {isLoading ? null : (
+                <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+                  {user ? (
+                    <Button asChild size="sm" variant="outline">
+                      <Link href="/dashboard">
+                        <span>Dashboard</span>
+                      </Link>
+                    </Button>
+                  ) : (
+                    <>
+                      <Button asChild size="sm" variant="outline">
+                        <LoginLink>
+                          <span>Login</span>
+                        </LoginLink>
+                      </Button>
+                      <Button asChild size="sm">
+                        <RegisterLink>
+                          <span>Sign up</span>
+                        </RegisterLink>
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

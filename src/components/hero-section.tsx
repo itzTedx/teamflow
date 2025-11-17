@@ -8,8 +8,6 @@ import { AnimatedGroup } from "@/components/ui/animated-group";
 import { Button } from "@/components/ui/button";
 import { TextEffect } from "@/components/ui/text-effect";
 
-import { HeroHeader } from "./header";
-
 const transitionVariants = {
   item: {
     hidden: {
@@ -33,7 +31,6 @@ const transitionVariants = {
 export default function HeroSection() {
   return (
     <>
-      <HeroHeader />
       <main className="overflow-hidden">
         <div aria-hidden className="absolute inset-0 isolate hidden opacity-65 contain-strict lg:block">
           <div className="-translate-y-87.5 -rotate-45 absolute top-0 left-0 h-320 w-140 rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,hsla(0,0%,85%,.08)_0,hsla(0,0%,55%,.02)_50%,hsla(0,0%,45%,0)_80%)]" />
@@ -172,16 +169,9 @@ export default function HeroSection() {
                 <div className="relative inset-shadow-2xs mx-auto max-w-6xl overflow-hidden rounded-2xl border bg-background p-4 shadow-lg shadow-zinc-950/15 ring-1 ring-background dark:inset-shadow-white/20">
                   <Image
                     alt="app screen"
-                    className="relative hidden aspect-15/8 rounded-2xl bg-background dark:block"
+                    className="relative aspect-15/8 rounded-2xl bg-background bg-cover"
                     height="1440"
-                    src="/mail2.png"
-                    width="2700"
-                  />
-                  <Image
-                    alt="app screen"
-                    className="relative z-2 aspect-15/8 rounded-2xl border border-border/25 dark:hidden"
-                    height="1440"
-                    src="/mail2-light.png"
+                    src="/background.webp"
                     width="2700"
                   />
                 </div>
