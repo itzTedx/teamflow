@@ -3,8 +3,11 @@
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isDefinedError } from "@orpc/client";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +20,9 @@ import {
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { LoadingSwap } from "@/components/ui/loading-swap";
 
+import { orpc } from "@/lib/orpc/client";
 import { ChannelSchema, channelSchema, transformChannelName } from "@/schema/channel";
 
 export const CreateChannel = () => {
@@ -30,11 +35,42 @@ export const CreateChannel = () => {
     },
   });
 
+  const queryClient = useQueryClient();
+
+  const createChannel = useMutation(
+    orpc.channel.create.mutationOptions({
+      onSuccess: (newChannel) => {
+        toast.success("Channel created", {
+          description: `Channel ${newChannel.name} created successfully`,
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: orpc.channel.list.queryKey(),
+        });
+
+        form.reset();
+        setOpen(false);
+      },
+
+      onError: (error) => {
+        if (isDefinedError(error)) {
+          if (error.code === "NOT_FOUND") {
+            toast.error("Oops! Something went wrong.", { description: error.message });
+            return;
+          }
+          toast.error("Failed to create channel, try again later!", { description: error.message });
+          return;
+        }
+        toast.error(error.message);
+      },
+    })
+  );
+
   const watchedName = form.watch("name");
   const transformedName = watchedName ? transformChannelName(watchedName) : "";
 
   function onSubmit(data: ChannelSchema) {
-    console.log(data);
+    createChannel.mutate(data);
   }
 
   return (
@@ -70,7 +106,9 @@ export const CreateChannel = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit">Create new channel</Button>
+            <Button disabled={createChannel.isPending} type="submit">
+              <LoadingSwap isLoading={createChannel.isPending}>Create new channel</LoadingSwap>
+            </Button>
           </form>
         </Form>
       </DialogContent>

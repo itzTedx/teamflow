@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { CreateWorkspace } from "./create-workspace";
 
 const colorCombinations = [
-  "bg-red-500 hover:bg-blue-600 text-white",
+  "bg-red-500 hover:bg-red-600 text-white",
   "bg-emerald-500 hover:bg-emerald-600 text-white",
   "bg-blue-500 hover:bg-blue-600 text-white",
   "bg-purple-500 hover:bg-purple-600 text-white",
