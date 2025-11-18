@@ -100,6 +100,8 @@ const addDefaultVariants = (variants: Variants) => ({
   visible: { ...defaultItemVariants.visible, ...variants.visible },
 });
 
+type MotionElement = React.ComponentType<Record<string, unknown>>;
+
 function AnimatedGroup({ children, className, variants, preset, as = "div", asChild = "div" }: AnimatedGroupProps) {
   const selectedVariants = {
     item: addDefaultVariants(preset ? presetVariants[preset] : {}),
@@ -108,13 +110,24 @@ function AnimatedGroup({ children, className, variants, preset, as = "div", asCh
   const containerVariants = variants?.container || selectedVariants.container;
   const itemVariants = variants?.item || selectedVariants.item;
 
-  const MotionComponent = React.useMemo(() => motion.create(as as keyof JSX.IntrinsicElements), [as]);
-  const MotionChild = React.useMemo(() => motion.create(asChild as keyof JSX.IntrinsicElements), [asChild]);
+  const MotionComponent = React.useMemo(
+    () =>
+      motion.create(as as (keyof React.JSX.IntrinsicElements & string) | React.ComponentType<unknown>) as MotionElement,
+    [as]
+  );
+  const MotionChild = React.useMemo(
+    () =>
+      motion.create(
+        asChild as (keyof React.JSX.IntrinsicElements & string) | React.ComponentType<unknown>
+      ) as MotionElement,
+    [asChild]
+  );
+  const childArray = React.useMemo(() => React.Children.toArray(children), [children]);
 
   return (
     <MotionComponent animate="visible" className={className} initial="hidden" variants={containerVariants}>
-      {React.Children.map(children, (child, index) => (
-        <MotionChild key={index} variants={itemVariants}>
+      {childArray.map((child) => (
+        <MotionChild key={(child as React.ReactElement)?.key ?? undefined} variants={itemVariants}>
           {child}
         </MotionChild>
       ))}

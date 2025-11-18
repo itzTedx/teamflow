@@ -1,3 +1,4 @@
+import { init, Organizations } from "@kinde/management-api-js";
 import { KindeOrganization, KindeUser } from "@kinde-oss/kinde-auth-nextjs";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { z } from "zod";
@@ -5,6 +6,7 @@ import { z } from "zod";
 import { requireAuth } from "@/middleware/auth";
 import { base } from "@/middleware/base";
 import { requireWorkspace } from "@/middleware/workspace";
+import { workspaceSchema } from "@/schema/workspace";
 
 export const listWorkspaces = base
   .use(requireAuth)
@@ -42,5 +44,63 @@ export const listWorkspaces = base
       workspaces,
       user: context.user,
       currentWorkspace: context.workspace,
+    };
+  });
+
+export const createWorkspace = base
+  .use(requireAuth)
+  .use(requireWorkspace)
+  .route({ method: "POST", path: "/workspace", summary: "Create a new workspace", tags: ["workspace"] })
+  .input(workspaceSchema)
+  .output(
+    z.object({
+      orgCode: z.string(),
+      workspaceName: z.string(),
+    })
+  )
+  .handler(async ({ input, context, errors }) => {
+    init();
+
+    let data;
+
+    try {
+      data = await Organizations.createOrganization({
+        requestBody: {
+          name: input.name,
+        },
+      });
+    } catch {
+      throw errors.FORBIDDEN();
+    }
+
+    if (!data.organization?.code) {
+      throw errors.FORBIDDEN({
+        message: "Org code is not defined",
+      });
+    }
+
+    try {
+      await Organizations.addOrganizationUsers({
+        orgCode: data.organization.code,
+        requestBody: {
+          users: [
+            {
+              id: context.user.id,
+              roles: ["admin"],
+            },
+          ],
+        },
+      });
+    } catch {
+      throw errors.FORBIDDEN();
+    }
+
+    const { refreshTokens } = getKindeServerSession();
+
+    await refreshTokens();
+
+    return {
+      orgCode: data.organization.code,
+      workspaceName: input.name,
     };
   });

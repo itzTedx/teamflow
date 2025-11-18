@@ -1,5 +1,6 @@
 "use client";
 
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { useSuspenseQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
@@ -41,15 +42,17 @@ export const WorkspaceList = () => {
           return (
             <Tooltip key={workspace.id}>
               <TooltipTrigger asChild>
-                <Button
-                  className={cn(
-                    "size-12 transition-all duration-100",
-                    getWorkspaceColor(workspace.id),
-                    isActive ? "rounded-lg" : "rounded-xl transition-all hover:rounded-lg"
-                  )}
-                >
-                  <span>{workspace.avatar}</span>
-                </Button>
+                <LoginLink orgCode={workspace.id}>
+                  <Button
+                    className={cn(
+                      "size-12 transition-all duration-100",
+                      getWorkspaceColor(workspace.id),
+                      isActive ? "rounded-lg" : "rounded-xl transition-all hover:rounded-lg"
+                    )}
+                  >
+                    <span>{workspace.avatar}</span>
+                  </Button>
+                </LoginLink>
               </TooltipTrigger>
               <TooltipContent side="right">
                 <p>{isActive ? "Current Workspace" : workspace.name}</p>
