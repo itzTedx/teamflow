@@ -1,26 +1,46 @@
-import { os } from "@orpc/server";
+import { KindeOrganization, KindeUser } from "@kinde-oss/kinde-auth-nextjs";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { z } from "zod";
 
-export const listWorkspaces = os
-  .route({ method: "GET", path: "/rpc/workspace", summary: "List all workspaces", tags: ["workspace"] })
-  .input(z.void())
-  .output(z.array(z.object({ id: z.number(), name: z.string() })))
-  .handler(async ({ input }) => {
-    return [
-      { id: 1, name: "Workspace 1" },
-      { id: 2, name: "Workspace 2" },
-      { id: 3, name: "Workspace 3" },
-    ];
-  });
+import { requireAuth } from "@/middleware/auth";
+import { base } from "@/middleware/base";
+import { requireWorkspace } from "@/middleware/workspace";
 
-export const getWorkspace = os
-  .input(
+export const listWorkspaces = base
+  .use(requireAuth)
+  .use(requireWorkspace)
+  .route({ method: "GET", path: "/workspace", summary: "List all workspaces", tags: ["workspace"] })
+  .input(z.void())
+  .output(
     z.object({
-      limit: z.number().int().min(1).max(100).optional(),
-      cursor: z.number().int().min(0).default(0),
+      workspaces: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          avatar: z.string(),
+        })
+      ),
+      user: z.custom<KindeUser<Record<string, unknown>> | null>(),
+      currentOrganization: z.custom<KindeOrganization<unknown> | null>(),
     })
   )
-  .handler(async ({ input }) => {
-    // your list code here
-    return [{ id: 1, name: "name" }];
+  .handler(async ({ context, errors }) => {
+    const { getUserOrganizations } = getKindeServerSession();
+    const organizations = await getUserOrganizations();
+
+    if (!organizations) {
+      throw errors.FORBIDDEN();
+    }
+
+    const workspaces = organizations?.orgs.map((org) => ({
+      id: org.code,
+      name: org.name ?? "My workspace",
+      avatar: org.name?.charAt(0).toUpperCase() ?? "M",
+    }));
+
+    return {
+      workspaces,
+      user: context.user,
+      currentOrganization: context.workspace,
+    };
   });
