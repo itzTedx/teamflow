@@ -21,9 +21,9 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
         {/* Channel List */}
         <div className="flex-1 overflow-y-auto px-4">
           <Collapsible defaultOpen>
-            <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-1 font-medium text-muted-foreground text-sm transition-[color] hover:text-accent-foreground">
+            <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-1 font-medium text-muted-foreground text-sm transition-[color] hover:text-accent-foreground [&[data-state=open]>svg]:rotate-180">
               Main
-              <ChevronDown className="size-3" />
+              <ChevronDown className="size-3 transition-transform" />
             </CollapsibleTrigger>
             <CollapsibleContent>
               <ChannelList />
@@ -32,9 +32,9 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
         </div>
         <div className="border-t px-4 py-2">
           <Collapsible defaultOpen>
-            <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-1 font-medium text-muted-foreground text-sm transition-[color] hover:text-accent-foreground">
+            <CollapsibleTrigger className="flex w-full items-center justify-between px-2 py-1 font-medium text-muted-foreground text-sm transition-[color] hover:text-accent-foreground [&[data-state=open]>svg]:rotate-180">
               Members
-              <ChevronDown className="size-3" />
+              <ChevronDown className="size-3 transition-transform" />
             </CollapsibleTrigger>
             <CollapsibleContent>
               <WorkspaceMembersList />
