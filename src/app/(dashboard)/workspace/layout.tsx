@@ -1,6 +1,7 @@
 import { orpc } from "@/lib/orpc/client";
 import { getQueryClient, HydrateClient } from "@/lib/query/hydration";
 
+import { UserNav } from "./_components/user-nav";
 import { WorkspaceList } from "./_components/workspace-list";
 
 export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
@@ -14,6 +15,12 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
         <HydrateClient client={queryClient}>
           <WorkspaceList />
         </HydrateClient>
+
+        <div className="mt-auto">
+          <HydrateClient client={queryClient}>
+            <UserNav />
+          </HydrateClient>
+        </div>
       </div>
       {children}
     </div>
