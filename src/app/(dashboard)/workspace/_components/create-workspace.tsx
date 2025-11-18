@@ -5,7 +5,14 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const CreateWorkspace = () => {
@@ -20,11 +27,12 @@ export const CreateWorkspace = () => {
             </Button>
           </DialogTrigger>
         </TooltipTrigger>
-        <TooltipContent>Create Workspace</TooltipContent>
+        <TooltipContent side="right">Create Workspace</TooltipContent>
       </Tooltip>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create Workspace</DialogTitle>
+          <DialogDescription>Create a new workspace to manage your projects and tasks.</DialogDescription>
         </DialogHeader>
       </DialogContent>
     </Dialog>

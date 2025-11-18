@@ -1,10 +1,19 @@
+import { orpc } from "@/lib/orpc/client";
+import { getQueryClient, HydrateClient } from "@/lib/query/hydration";
+
 import { WorkspaceList } from "./_components/workspace-list";
 
-export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
+export default async function WorkspaceLayout({ children }: { children: React.ReactNode }) {
+  const queryClient = getQueryClient();
+
+  await queryClient.prefetchQuery(orpc.workspace.list.queryOptions());
+
   return (
     <div className="flex h-screen w-full">
       <div className="flex h-full w-16 flex-col items-center border-r bg-secondary px-2 py-3">
-        <WorkspaceList />
+        <HydrateClient client={queryClient}>
+          <WorkspaceList />
+        </HydrateClient>
       </div>
       {children}
     </div>

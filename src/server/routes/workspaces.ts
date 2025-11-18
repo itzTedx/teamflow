@@ -21,7 +21,7 @@ export const listWorkspaces = base
         })
       ),
       user: z.custom<KindeUser<Record<string, unknown>> | null>(),
-      currentOrganization: z.custom<KindeOrganization<unknown> | null>(),
+      currentWorkspace: z.custom<KindeOrganization<unknown> | null>(),
     })
   )
   .handler(async ({ context, errors }) => {
@@ -41,6 +41,6 @@ export const listWorkspaces = base
     return {
       workspaces,
       user: context.user,
-      currentOrganization: context.workspace,
+      currentWorkspace: context.workspace,
     };
   });
