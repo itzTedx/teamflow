@@ -15,7 +15,7 @@ async function handleRequest(request: Request) {
   const { response } = await handler.handle(request, {
     prefix: "/rpc",
     context: {
-      request: request,
+      request,
     },
   });
 

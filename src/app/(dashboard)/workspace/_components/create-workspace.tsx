@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isDefinedError } from "@orpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2, Plus } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -53,7 +54,15 @@ export const CreateWorkspace = () => {
         setOpen(false);
       },
       onError: (error) => {
-        toast.error("Failed to create workspace, Try again later!", { description: error.message });
+        if (isDefinedError(error)) {
+          if (error.code === "NOT_FOUND") {
+            toast.error("Slow down!", { description: error.message });
+            return;
+          }
+          toast.error("Failed to create workspace, try again later!", { description: error.message });
+          return;
+        }
+        toast.error(error.message);
       },
     })
   );

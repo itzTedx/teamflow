@@ -3,6 +3,8 @@ import { KindeOrganization, KindeUser } from "@kinde-oss/kinde-auth-nextjs";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { z } from "zod";
 
+import { heavyWriteSecurity } from "@/middleware/arcject/heavy-write";
+import { standardSecurity } from "@/middleware/arcject/standard";
 import { requireAuth } from "@/middleware/auth";
 import { base } from "@/middleware/base";
 import { requireWorkspace } from "@/middleware/workspace";
@@ -50,6 +52,8 @@ export const listWorkspaces = base
 export const createWorkspace = base
   .use(requireAuth)
   .use(requireWorkspace)
+  .use(standardSecurity)
+  .use(heavyWriteSecurity)
   .route({ method: "POST", path: "/workspace", summary: "Create a new workspace", tags: ["workspace"] })
   .input(workspaceSchema)
   .output(
