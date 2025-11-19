@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, lt, or } from "drizzle-orm";
 import z from "zod";
 
 import { getAvatar } from "@/lib/avatar";
@@ -52,8 +52,19 @@ export const listMessages = base
   .use(standardSecurity)
   .use(readSecurity)
   .route({ method: "GET", path: "/messages", summary: "List all messages", tags: ["message"] })
-  .input(z.object({ channelId: z.string() }))
-  .output(z.array(z.custom<Message>()))
+  .input(
+    z.object({
+      channelId: z.string(),
+      limit: z.number().min(1).max(100).optional(),
+      cursor: z.string().optional(),
+    })
+  )
+  .output(
+    z.object({
+      items: z.array(z.custom<Message>()),
+      nextCursor: z.string().optional(),
+    })
+  )
   .handler(async ({ input, context, errors }) => {
     // Verify the channel belongs to the workspace and the user is a member of the workspace
     const channel = await db.query.channelTable.findFirst({
@@ -63,12 +74,48 @@ export const listMessages = base
       throw errors.NOT_FOUND();
     }
 
+    // Define the default limit
+    const limit = input.limit ?? 30;
+
+    // Build where clause for cursor-based pagination
+    const baseWhere = eq(messageTable.channelId, input.channelId);
+
+    let whereClause = baseWhere;
+
+    if (input.cursor) {
+      // Fetch the cursor message to get its createdAt timestamp
+      const cursorMessage = await db.query.messageTable.findFirst({
+        where: eq(messageTable.id, input.cursor),
+      });
+
+      if (cursorMessage) {
+        // For descending order, get messages created before the cursor message
+        // or with same timestamp but different id (for tie-breaking)
+        const cursorCondition = or(
+          lt(messageTable.createdAt, cursorMessage.createdAt),
+          and(eq(messageTable.createdAt, cursorMessage.createdAt), lt(messageTable.id, cursorMessage.id))
+        );
+        const combinedWhere = and(baseWhere, cursorCondition);
+        if (combinedWhere) {
+          whereClause = combinedWhere;
+        }
+      }
+    }
+
     // Get the messages for the channel
     const messages = await db.query.messageTable.findMany({
-      where: eq(messageTable.channelId, input.channelId),
-      orderBy: [desc(messageTable.createdAt)],
+      where: whereClause,
+      orderBy: [desc(messageTable.createdAt), desc(messageTable.id)],
+      limit: limit + 1, // Fetch one extra to determine if there's a next page
     });
 
-    // Return the messages
-    return messages;
+    // Determine if there's a next page and get the next cursor
+    const hasNextPage = messages.length > limit;
+    const items = hasNextPage ? messages.slice(0, limit) : messages;
+    const nextCursor = hasNextPage ? items[items.length - 1]?.id : undefined;
+
+    return {
+      items,
+      nextCursor,
+    };
   });

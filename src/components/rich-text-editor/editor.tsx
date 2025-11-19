@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+
 import { EditorContent, useEditor } from "@tiptap/react";
 import { ControllerRenderProps } from "react-hook-form";
 
@@ -15,6 +17,8 @@ interface EditorProps {
 }
 
 export const Editor = ({ field, sendButton, footer }: EditorProps) => {
+  const isUpdatingFromFieldRef = useRef(false);
+
   const editor = useEditor({
     extensions: editorExtensions,
     content: (() => {
@@ -26,6 +30,9 @@ export const Editor = ({ field, sendButton, footer }: EditorProps) => {
       }
     })(),
     onUpdate: ({ editor }) => {
+      // Skip onChange if we're updating from field value (e.g., form reset)
+      if (isUpdatingFromFieldRef.current) return;
+
       if (field.onChange) {
         field.onChange(JSON.stringify(editor.getJSON()));
       }
@@ -45,6 +52,32 @@ export const Editor = ({ field, sendButton, footer }: EditorProps) => {
       },
     },
   });
+
+  // Sync editor content with field value changes (e.g., when form is reset)
+  useEffect(() => {
+    if (!editor) return;
+
+    const currentContent = JSON.stringify(editor.getJSON());
+    const fieldContent = field.value || "";
+
+    // Only update if the content is different to avoid infinite loops
+    if (currentContent !== fieldContent) {
+      isUpdatingFromFieldRef.current = true;
+
+      try {
+        const newContent = fieldContent ? JSON.parse(fieldContent) : "";
+        editor.commands.setContent(newContent);
+      } catch {
+        // If parsing fails, clear the editor
+        editor.commands.setContent("");
+      }
+
+      // Reset the flag after the update completes
+      setTimeout(() => {
+        isUpdatingFromFieldRef.current = false;
+      }, 0);
+    }
+  }, [editor, field.value]);
 
   return (
     <div className="relative flex w-full max-w-none flex-col overflow-hidden rounded-lg border border-input dark:bg-input/30">
