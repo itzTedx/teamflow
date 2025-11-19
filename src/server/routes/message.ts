@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import z from "zod";
 
 import { getAvatar } from "@/lib/avatar";
@@ -43,4 +43,18 @@ export const createMessage = base
       .returning();
 
     return created;
+  });
+
+export const listMessages = base
+  .use(requireAuth)
+  .use(requireWorkspace)
+  .route({ method: "GET", path: "/messages", summary: "List all messages", tags: ["message"] })
+  .input(z.object({ channelId: z.string() }))
+  .output(z.array(z.custom<Message>()))
+  .handler(async ({ input }) => {
+    const messages = await db.query.messageTable.findMany({
+      where: eq(messageTable.channelId, input.channelId),
+      orderBy: [desc(messageTable.createdAt)],
+    });
+    return messages;
   });

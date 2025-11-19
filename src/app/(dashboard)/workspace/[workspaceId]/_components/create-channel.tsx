@@ -23,9 +23,14 @@ import { Input } from "@/components/ui/input";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 
 import { orpc } from "@/lib/orpc/client";
+import { cn } from "@/lib/utils";
 import { ChannelSchema, channelSchema, transformChannelName } from "@/schema/channel";
 
-export const CreateChannel = () => {
+interface Props {
+  className?: string;
+}
+
+export const CreateChannel = ({ className }: Props) => {
   const [open, setOpen] = useState(false);
 
   const form = useForm<ChannelSchema>({
@@ -76,7 +81,7 @@ export const CreateChannel = () => {
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
-        <Button className="w-full" variant="outline">
+        <Button className={cn("w-full", className)} variant="outline">
           <Plus className="size-4" /> Create Channel
         </Button>
       </DialogTrigger>

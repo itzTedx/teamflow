@@ -1,4 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import arcjet, { createMiddleware, detectBot } from "@arcjet/next";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 
 const aj = arcjet({
   key: process.env.ARCJET_KEY!,
@@ -9,7 +12,21 @@ const aj = arcjet({
   ],
 });
 
-export default createMiddleware(aj);
+async function existingMiddleware(req: NextRequest) {
+  const { getClaim } = getKindeServerSession();
+  const orgCode = await getClaim("org_code");
+
+  const url = req.nextUrl;
+
+  if (url.pathname.startsWith("/workspace") && !url.pathname.includes(orgCode?.value || "")) {
+    url.pathname = `/workspace/${orgCode?.value}`;
+    return NextResponse.redirect(url);
+  }
+
+  return NextResponse.next();
+}
+
+export default createMiddleware(aj, existingMiddleware);
 
 export const config = {
   // matcher tells Next.js which routes to run the middleware on.

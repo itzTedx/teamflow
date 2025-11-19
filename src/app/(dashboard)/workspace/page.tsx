@@ -1,7 +1,3 @@
-import { client } from "@/lib/orpc/client";
-
-export default async function WorkspacePage() {
-  const workspaces = await client.workspace.list();
-
+export default function WorkspacePage() {
   return <div>WorkspacePage</div>;
 }

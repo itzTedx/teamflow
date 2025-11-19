@@ -8,12 +8,13 @@ import { MessageList } from "./_components/message-list";
 
 export default function ChannelPage() {
   const { channelId } = useParams<{ channelId: string }>();
+
   return (
     <main className="flex h-screen w-full">
       <div className="flex min-w-0 flex-1 flex-col">
         <ChannelHeader />
         <div className="my-4 flex-1 overflow-hidden">
-          <MessageList />
+          <MessageList channelId={channelId} />
         </div>
 
         <div className="border-t bg-background p-4">
