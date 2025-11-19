@@ -70,3 +70,19 @@ export const listChannels = base
       currentWorkspace: context.workspace,
     };
   });
+
+export const getChannelById = base
+  .use(requireAuth)
+  .use(requireWorkspace)
+  .route({ method: "GET", path: "/channels/:id", summary: "Get a channel by ID", tags: ["channel"] })
+  .input(z.object({ id: z.string() }))
+  .output(z.custom<Channel>())
+  .handler(async ({ input, errors }) => {
+    const channel = await db.query.channelTable.findFirst({
+      where: eq(channelTable.id, input.id),
+    });
+    if (!channel) {
+      throw errors.NOT_FOUND();
+    }
+    return channel;
+  });

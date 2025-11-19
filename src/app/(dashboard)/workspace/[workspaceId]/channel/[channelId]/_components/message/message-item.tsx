@@ -1,7 +1,9 @@
 import Image from "next/image";
 
+import { SafeContent } from "@/components/rich-text-editor/safe-content";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
+import { getAvatar } from "@/lib/avatar";
 import { Message } from "@/server/schema";
 
 interface MessageItemProps {
@@ -12,7 +14,12 @@ export const MessageItem = ({ message }: MessageItemProps) => {
   return (
     <div className="group relative flex gap-3 rounded-lg p-2 hover:bg-muted/50">
       <Avatar className="relative rounded-lg">
-        <Image alt={`${message.authorName}'s Avatar`} height={32} src={message.authorAvatar} width={32} />
+        <Image
+          alt={`${message.authorName}'s Avatar`}
+          height={32}
+          src={getAvatar(message.authorEmail, message.authorAvatar)}
+          width={32}
+        />
         <AvatarFallback>{message.authorName.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1 space-y-1">
@@ -31,7 +38,7 @@ export const MessageItem = ({ message }: MessageItemProps) => {
             }).format(message.createdAt)}
           </p>
         </div>
-        <p className="wrap-break-words max-w-none text-sm">{message.content}</p>
+        <SafeContent content={JSON.parse(message.content)} />
       </div>
     </div>
   );

@@ -33,6 +33,9 @@
         "useValidAriaProps": "warn",
         "useValidAriaValues": "warn"
       },
+      "security": {
+        "noDangerouslySetInnerHtml": "off"
+      },
       "complexity": {
         "noUselessThisAlias": "error",
         "noUselessTypeConstraint": "error",
@@ -101,6 +104,11 @@
       "quoteStyle": "double",
       "attributePosition": "auto",
       "bracketSpacing": true
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
     }
   },
   "html": { "formatter": { "selfCloseVoidElements": "always" } },

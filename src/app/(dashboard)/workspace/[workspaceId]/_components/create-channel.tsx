@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { useParams, useRouter } from "next/navigation";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isDefinedError } from "@orpc/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -32,6 +34,9 @@ interface Props {
 
 export const CreateChannel = ({ className }: Props) => {
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { workspaceId } = useParams<{ workspaceId: string }>();
 
   const form = useForm<ChannelSchema>({
     resolver: zodResolver(channelSchema),
@@ -39,8 +44,6 @@ export const CreateChannel = ({ className }: Props) => {
       name: "",
     },
   });
-
-  const queryClient = useQueryClient();
 
   const createChannel = useMutation(
     orpc.channel.create.mutationOptions({
@@ -55,6 +58,8 @@ export const CreateChannel = ({ className }: Props) => {
 
         form.reset();
         setOpen(false);
+
+        router.push(`/workspace/${workspaceId}/channel/${newChannel.id}`);
       },
 
       onError: (error) => {

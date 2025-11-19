@@ -8,19 +8,20 @@ import { MessageType } from "@/schema/message";
 
 interface MessageComposerProps {
   field: ControllerRenderProps<MessageType, "content">;
+  disabled?: boolean;
 }
-export const MessageComposer = ({ field }: MessageComposerProps) => {
+export const MessageComposer = ({ field, disabled }: MessageComposerProps) => {
   return (
     <>
       <Editor
         field={field}
         footer={
-          <Button size="sm" type="button" variant="outline">
+          <Button disabled={disabled} size="sm" type="button" variant="outline">
             <ImageIcon className="mr-1 size-4" /> Attach
           </Button>
         }
         sendButton={
-          <Button size="sm" type="submit">
+          <Button disabled={disabled} size="sm" type="submit">
             <Send className="mr-1 size-4" />
             Send
           </Button>

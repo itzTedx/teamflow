@@ -4,7 +4,7 @@ export const MessageListSkeleton = () => {
   return (
     <div className="relative h-full">
       <div className="h-full overflow-y-auto px-4">
-        {Array.from({ length: 8 }, (_, index) => `message-skeleton-${index}`).map((key) => (
+        {Array.from({ length: 5 }, (_, index) => `message-skeleton-${index}`).map((key) => (
           <div className="group relative flex gap-3 rounded-lg p-2" key={key}>
             <Skeleton className="size-8 shrink-0 rounded-lg" />
             <div className="min-w-0 flex-1 space-y-1">

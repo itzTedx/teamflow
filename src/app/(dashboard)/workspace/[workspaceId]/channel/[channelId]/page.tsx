@@ -12,7 +12,7 @@ export default function ChannelPage() {
   return (
     <main className="flex h-screen w-full">
       <div className="flex min-w-0 flex-1 flex-col">
-        <ChannelHeader />
+        <ChannelHeader channelId={channelId} />
         <div className="my-4 flex-1 overflow-hidden">
           <MessageList channelId={channelId} />
         </div>
