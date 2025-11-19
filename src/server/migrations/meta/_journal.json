@@ -8,6 +8,13 @@
       "when": 1763474734212,
       "tag": "0000_charming_skin",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763491436764,
+      "tag": "0001_furry_scorpion",
+      "breakpoints": true
     }
   ]
 }

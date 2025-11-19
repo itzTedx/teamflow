@@ -11,7 +11,7 @@ export default async function WorkspaceLayout({ children }: { children: React.Re
 
   return (
     <div className="flex h-screen w-full">
-      <div className="flex h-full w-16 flex-col items-center border-r bg-secondary px-2 py-3">
+      <div className="flex h-full w-16 flex-col items-center border-r bg-secondary/80 px-2 py-3">
         <HydrateClient client={queryClient}>
           <WorkspaceList />
         </HydrateClient>

@@ -1,4 +1,7 @@
+import { relations } from "drizzle-orm";
 import { index, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+
+import { messageTable } from "./message";
 
 export const channelTable = pgTable(
   "channels",
@@ -17,5 +20,9 @@ export const channelTable = pgTable(
   },
   (table) => [index("channels_workspace_id_idx").on(table.workspaceId), index("name_idx").on(table.name)]
 );
+
+export const channelRelations = relations(channelTable, ({ many }) => ({
+  messages: many(messageTable),
+}));
 
 export type Channel = typeof channelTable.$inferSelect;
